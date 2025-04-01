@@ -1,0 +1,2 @@
+# ignore everything in the docker_volums directory
+docker_volums/*
