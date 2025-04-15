@@ -1,0 +1,22 @@
+# Use official Python base image
+FROM python:3.11-slim
+
+# Install PostgreSQL dev libs
+RUN apt-get update && apt-get install -y libpq-dev gcc
+
+# Set working directory
+WORKDIR /tests
+
+# Copy files
+COPY tests/test_postgres.py .
+COPY tests/requirements.txt .
+COPY tests/test_postgres_queries.json .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create the log directory
+RUN mkdir /logs
+
+# Run the script
+CMD ["python", "test_postgres.py"]

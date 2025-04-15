@@ -1,0 +1,62 @@
+{
+    "Test database connection": {
+        "queries": [
+            {
+                "label": "Check PostgreSQL version",
+                "query": "SELECT version();"
+            }
+        ]
+    },
+    "Simple queries": {
+        "queries": [
+            {
+                "label": "Get a few patients data",
+                "query": "SELECT * FROM patient LIMIT 10;"
+            },
+            {
+                "label": "Get all patients older than 65",
+                "query": "SELECT * FROM patient WHERE age > 65;"
+            },
+            {
+                "label": "Count the number of entries in the lab table",
+                "query": "SELECT COUNT(*) FROM lab;"
+            },
+            {
+                "label": "List unique diagnoses",
+                "query": "SELECT DISTINCT diagnosisstring FROM diagnosis LIMIT 20;"
+            }
+        ]
+    },
+    "Complex queries": {
+        "queries": [
+            {
+                "label": "Get average age of patients grouped by gender",
+                "query": "SELECT gender, AVG(age) AS avg_age FROM patient GROUP BY gender;"
+            },
+            {
+                "label": "Get number of diagnoses per patient",
+                "query": "SELECT patientunitstayid, COUNT(*) AS diagnosis_count FROM diagnosis GROUP BY patientunitstayid ORDER BY diagnosis_count DESC;"
+            },
+            {
+                "label": "Join patient and vitalperiodic to get heart rate info",
+                "query": "SELECT p.patientunitstayid, p.gender, v.heartrate FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid WHERE v.heartrate IS NOT NULL LIMIT 50;"
+            }
+        ]
+    },
+    "Computationally simple query": {
+        "queries": [
+            {
+                "label": "Get minimum and maximum temperature from vitalperiodic",
+                "query": "SELECT MIN(temperature), MAX(temperature) FROM vitalperiodic;"
+            }
+        ]
+    },
+    "Computationally complex query": {
+        "queries": [
+            {
+                "label": "Compute average heart rate for patients with >100 vitals entries",
+                "query": "SELECT patientunitstayid, AVG(heartrate) AS avg_hr FROM vitalperiodic GROUP BY patientunitstayid HAVING COUNT(*) > 100 ORDER BY avg_hr DESC LIMIT 20;"
+            }
+        ]
+    }
+}

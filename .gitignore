@@ -1,2 +1,4 @@
 # ignore everything in the docker_volums directory
 docker_volums/*
+tests/__pycache__/*
+init/eicu_v2_0_1.sqlite3

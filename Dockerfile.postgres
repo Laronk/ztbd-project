@@ -1,0 +1,14 @@
+FROM postgres:17.4-bullseye
+
+# Install required build tools and libraries
+RUN apt-get update && apt-get install -y \
+    curl git sbcl make unzip wget gnupg ca-certificates \
+    sqlite3 libsqlite3-dev \
+    libgmp-dev libssl-dev libz-dev libcurl4-openssl-dev \
+    libffi-dev pkg-config
+
+# Clone pgloader and remove MSSQL support (fully)
+RUN apt-get install -y pgloader
+
+# Copy the SQLite DB and the import script to the init folder
+COPY init /docker-entrypoint-initdb.d/

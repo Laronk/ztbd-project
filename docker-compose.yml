@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker_volumes/postgres_volume:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d # SQLite file
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h localhost -U myuser -d mydb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgloader:
+    image: dimitri/pgloader
+    container_name: pgloader-container
+    environment:
+      PG_HOST: postgres-container
+      PG_PORT: 5432
+      PG_USER: myuser
+      PG_PASSWORD: mypassword
+      PG_DBNAME: mydb
+    volumes:
+      - ./init:/init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: pgloader sqlite:///init/eicu_v2_0_1.sqlite3 postgresql://myuser:mypassword@postgres-container:5432/mydb
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-h", "postgres-container", "-U", "myuser", "-d", "mydb" ]
+      interval: 10s
+      retries: 5
+
+  database-tester:
+    build:
+      context: .
+      dockerfile: Dockerfile.tester
+    container_name: database-tester-container
+    environment:
+      DB_HOST: postgres-container # ✅ use actual container name!
+      DB_PORT: 5432
+      DB_NAME: mydb
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./tests:/tests # volume for Python scripts
+    entrypoint: [ "python", "test_postgres.py" ]
