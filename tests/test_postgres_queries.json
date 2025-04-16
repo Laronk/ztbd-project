@@ -1,61 +1,57 @@
 {
-    "Test database connection": {
+    "Lightweight queries": {
         "queries": [
             {
-                "label": "Check PostgreSQL version",
-                "query": "SELECT version();"
+                "label": "Count all patients",
+                "query": "SELECT COUNT(*) FROM patient;",
+                "comment": "Tests basic aggregate performance on a medium-sized table. Confirms table availability and responsiveness."
+            },
+            {
+                "label": "Insert and delete a note entry",
+                "query": "INSERT INTO note (patientunitstayid, notetext) VALUES (1000001, 'Test note'); DELETE FROM note WHERE patientunitstayid = 1000001;",
+                "comment": "Verifies basic INSERT/DELETE functionality within the same query scope using a known patientunitstayid."
             }
         ]
     },
-    "Simple queries": {
+    "Medium-heavy queries": {
         "queries": [
             {
-                "label": "Get a few patients data",
-                "query": "SELECT * FROM patient LIMIT 10;"
+                "label": "Patients with more than 5 diagnoses",
+                "query": "SELECT patientunitstayid, COUNT(*) AS dx_count FROM diagnosis GROUP BY patientunitstayid HAVING COUNT(*) > 5;",
+                "comment": "Tests grouped filtering logic on a many-to-one relationship. Measures efficiency of HAVING on larger datasets."
             },
             {
-                "label": "Get all patients older than 65",
-                "query": "SELECT * FROM patient WHERE age > 65;"
-            },
-            {
-                "label": "Count the number of entries in the lab table",
-                "query": "SELECT COUNT(*) FROM lab;"
-            },
-            {
-                "label": "List unique diagnoses",
-                "query": "SELECT DISTINCT diagnosisstring FROM diagnosis LIMIT 20;"
+                "label": "Insert and delete 10 dummy lab records",
+                "query": "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (1000002, 'TestLab0', 7.0), (1000002, 'TestLab1', 8.0), (1000002, 'TestLab2', 9.0), (1000002, 'TestLab3', 10.0), (1000002, 'TestLab4', 11.0), (1000002, 'TestLab5', 12.0), (1000002, 'TestLab6', 13.0), (1000002, 'TestLab7', 14.0), (1000002, 'TestLab8', 15.0), (1000002, 'TestLab9', 16.0); DELETE FROM lab WHERE patientunitstayid = 1000002;",
+                "comment": "Tests batch INSERT and DELETE performance using lab records to simulate small patient episode."
             }
         ]
     },
-    "Complex queries": {
+    "Heavy queries": {
         "queries": [
             {
-                "label": "Get average age of patients grouped by gender",
-                "query": "SELECT gender, AVG(age) AS avg_age FROM patient GROUP BY gender;"
+                "label": "Aggregate vitals across all patients",
+                "query": "SELECT AVG(heartrate), MIN(temperature), MAX(temperature) FROM vitalperiodic WHERE heartrate IS NOT NULL;",
+                "comment": "Heavy full-table aggregation simulating clinical monitoring dashboard KPIs."
             },
             {
-                "label": "Get number of diagnoses per patient",
-                "query": "SELECT patientunitstayid, COUNT(*) AS diagnosis_count FROM diagnosis GROUP BY patientunitstayid ORDER BY diagnosis_count DESC;"
-            },
-            {
-                "label": "Join patient and vitalperiodic to get heart rate info",
-                "query": "SELECT p.patientunitstayid, p.gender, v.heartrate FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid WHERE v.heartrate IS NOT NULL LIMIT 50;"
+                "label": "Top 20 patients by lab test count",
+                "query": "SELECT patientunitstayid, COUNT(*) AS lab_count FROM lab GROUP BY patientunitstayid ORDER BY lab_count DESC LIMIT 20;",
+                "comment": "Stresses GROUP BY and ORDER BY with large grouping cardinality."
             }
         ]
     },
-    "Computationally simple query": {
+    "Real life use cases": {
         "queries": [
             {
-                "label": "Get minimum and maximum temperature from vitalperiodic",
-                "query": "SELECT MIN(temperature), MAX(temperature) FROM vitalperiodic;"
-            }
-        ]
-    },
-    "Computationally complex query": {
-        "queries": [
+                "label": "Patient vitals trend with diagnosis",
+                "query": "SELECT p.patientunitstayid, v.observationoffset, v.heartrate, d.diagnosisstring FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid JOIN diagnosis d ON p.patientunitstayid = d.patientunitstayid WHERE v.heartrate IS NOT NULL ORDER BY p.patientunitstayid, v.observationoffset LIMIT 100;",
+                "comment": "Simulates a real-world monitoring interface combining time-series vitals and diagnoses."
+            },
             {
-                "label": "Compute average heart rate for patients with >100 vitals entries",
-                "query": "SELECT patientunitstayid, AVG(heartrate) AS avg_hr FROM vitalperiodic GROUP BY patientunitstayid HAVING COUNT(*) > 100 ORDER BY avg_hr DESC LIMIT 20;"
+                "label": "Insert patient with vitals and delete them",
+                "query": "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (1000003, 65, 'Male', 1); INSERT INTO vitalperiodic (patientunitstayid, temperature, heartrate) VALUES (1000003, 36.6, 72), (1000003, 37.6, 73), (1000003, 36.6, 74), (1000003, 37.6, 75), (1000003, 36.6, 76); DELETE FROM vitalperiodic WHERE patientunitstayid = 1000003; DELETE FROM patient WHERE patientunitstayid = 1000003;",
+                "comment": "Mimics a short-term admission and cleanup. End-to-end test of INSERT + JOINED READ + DELETE in realistic sequence."
             }
         ]
     }
