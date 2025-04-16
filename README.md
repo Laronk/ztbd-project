@@ -29,12 +29,6 @@ mv temp_folder/eicu_v2_0_1.sqlite3 init/
 rm -r temp_folder
 ```
 
-Before running Docker, make sure the data import script is executable:
-
-```bash
-chmod +x init/import_pg.sh
-```
-
 ---
 
 ## 🐳 Running the Docker Environment
