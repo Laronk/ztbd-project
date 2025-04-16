@@ -10,6 +10,22 @@ Projekt analizuje dane z serwisu [PhysioNet](https://physionet.org/) z wykorzyst
 
 ## 🚀 Setup
 
+Download the EICU demo dataset and place the .sqlite3 file into the `init/` folder.
+
+Download the [eICU Collaborative Research Database Demo (v2.0.1)](https://physionet.org/static/published-projects/eicu-crd-demo/eicu-collaborative-research-database-demo-2.0.1.zip) and extract it into the `init/` folder. Only the `.sqlite3` file is required for this project.
+
+To extract the `.zip` file on Linux and move the `.sqlite3` file to the `init/` folder, use the following commands:
+
+```bash
+wget -r -N -c -np https://physionet.org/content/eicu-crd-demo/2.0.1/sqlite/eicu_v2_0_1.sqlite3.gz
+```
+
+```bash
+unzip eicu_v2_0_1.sqlite3.gz -d temp_folder
+mv temp_folder/eicu_v2_0_1.sqlite3 init/
+rm -r temp_folder
+```
+
 Before running Docker, make sure the data import script is executable:
 
 ```bash
