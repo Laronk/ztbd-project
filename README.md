@@ -3,6 +3,9 @@
 Repozytorium projektu realizowanego w ramach kursu **Zaawansowane Technologie Baz Danych**.  
 Projekt analizuje dane z serwisu [PhysioNet](https://physionet.org/) z wykorzystaniem systemu Docker i PostgreSQL.
 
+Aby uzyskać szczegółowe informacje na temat schematu bazy danych, zapoznaj się z oficjalną dokumentacją:
+[Tabela Admission Drug - eICU Collaborative Research Database](https://eicu-crd.mit.edu/eicutables/admissiondrug/)
+
 📄 Raport z projektu:  
 [Kliknij tutaj, aby otworzyć dokument Google](https://docs.google.com/document/d/1ZmpCnKk0zSc0tX4yNQb256DEPOkSrqNnXOcXAUdnOXw/edit?usp=sharing)
 
