@@ -1,6 +1,6 @@
-### 📋 Project TODO
+# 📋 Project TODO
 
-#### 🧪 Test Execution Enhancements
+## 🧪 Test Execution Enhancements
 - [ ] **Add test activation toggle**  
   Allow individual tests or test suites to be conditionally executed (e.g. via `"enabled": true/false` flag in JSON).
 
@@ -9,7 +9,7 @@
 
 ---
 
-#### 📈 Logging Improvements
+## 📈 Logging Improvements
 - [ ] **Include time unit in summary statistics**  
   Example: `Median Time by Query Type: {'SELECT': 0.005442}` → `0.005442 s`
 
@@ -18,3 +18,12 @@
 
 - [ ] **Log per-suite timing stats to output files**  
   Extend summary logs to include avg/min/max query time per suite.
+
+## Other
+- [ ] **Translate data from .sqlite3 to mongoDB format**
+
+- [ ] **Write test queries**
+
+- [ ] **Perform test query result analysis**
+
+- [ ] **Translate the queries from postgres to mongoDB format**
