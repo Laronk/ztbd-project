@@ -7,19 +7,17 @@ ROLLBACK_INCOMPATIBLE = {"CREATE", "DROP", "ALTER", "VACUUM", "GRANT", "REVOKE"}
 
 def execute_query_safely(conn, query_label, query):
     """
-    Executes a SQL query using the following logic:
-
-    1. Determines the type of the query (e.g., SELECT, CREATE, etc.)
-    2. If the query type is rollback-compatible:
-       - Starts a transaction
-       - Executes the query
-       - Rolls it back to reset state
-    3. If the query type is not rollback-compatible:
-       - Calls reset_database() to reinitialize the DB
-       - Executes the query afterward without rollback
-    4. Measures and returns the execution time
-    5. Captures the row count or failure details
-    6. Returns a dictionary with query execution metadata
+    # 1. It takes a database connection, a label for the query, and the SQL query itself.
+    # 2. It determines the type of the query using the `get_query_type` function.
+    # 3. It initializes a result dictionary to store the outcome of the query execution.
+    # 4. It attempts to execute the query within a try-except block.
+    # 5. If the query is rollback-incompatible, it resets the database before executing the query.
+    # 6. It measures the execution time of the query.
+    # 7. It executes the query using a cursor from the connection.
+    # 8. It updates the result dictionary with the execution time and row count.
+    # 9. If the query is successful, it rolls back the transaction if it's not rollback-incompatible.
+    # 10. If an exception occurs, it updates the result dictionary with the error message and rolls back the transaction if necessary.
+    # 11. Finally, it returns the result dictionary containing the query label, query, type, success status, row count, error message, and execution time.
     """
 
     query_type = get_query_type(query)
@@ -34,31 +32,26 @@ def execute_query_safely(conn, query_label, query):
     }
 
     try:
-        # Reset database if the query cannot be safely rolled back
         if query_type in ROLLBACK_INCOMPATIBLE:
             print(f"⚠️ Non-rollback-compatible query detected: [{query_type}] — Resetting DB...")
             reset_database(with_import=True)
 
-        cur = conn.cursor()
-
-        if query_type not in ROLLBACK_INCOMPATIBLE:
-            cur.execute("BEGIN;")
-
         start = time.time()
-        cur.execute(query)
-        result["execution_time"] = time.time() - start
-        result["rowcount"] = cur.rowcount
-        result["success"] = True
 
-        if query_type not in ROLLBACK_INCOMPATIBLE:
-            conn.rollback()
-        cur.close()
+        with conn.cursor() as cur:
+            cur.execute(query)
+            result["execution_time"] = time.time() - start
+            result["rowcount"] = cur.rowcount
+            result["success"] = True
+
+            if query_type not in ROLLBACK_INCOMPATIBLE:
+                conn.rollback()
 
     except Exception as e:
         result["execution_time"] = time.time() - start
         result["error"] = str(e)
+
         if query_type not in ROLLBACK_INCOMPATIBLE:
             conn.rollback()
-        cur.close()
 
     return result

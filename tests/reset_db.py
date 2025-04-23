@@ -9,7 +9,7 @@ DB_NAME = os.getenv("DB_NAME", "mydb")
 DB_USER = os.getenv("DB_USER", "myuser")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "mypassword")
 
-PGLOADER_SQLITE_PATH = "/init/data.sqlite3"  # Adjust if needed
+PGLOADER_SQLITE_PATH = "/init/eicu_v2_0_1.sqlite3"
 PGLOADER_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 def reset_postgres_schema():
