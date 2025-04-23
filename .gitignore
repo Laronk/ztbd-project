@@ -2,6 +2,7 @@
 docker_volums/*
 tests/__pycache__/*
 init/eicu_v2_0_1.sqlite3
+init/backup__eicu_v2_0_1.sqlite3
 schema_with_foreign_keys.sql
 .gitignore
 schema.sql
