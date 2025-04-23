@@ -1,9 +1,10 @@
+
 # ZTBD-Projekt-PhysioNet
 
 Repozytorium projektu realizowanego w ramach kursu **Zaawansowane Technologie Baz Danych**.  
 Projekt analizuje dane z serwisu [PhysioNet](https://physionet.org/) z wykorzystaniem systemu Docker i PostgreSQL.
 
-Aby uzyskać szczegółowe informacje na temat schematu bazy danych, zapoznaj się z oficjalną dokumentacją:
+Aby uzyskać szczegółowe informacje na temat schematu bazy danych, zapoznaj się z oficjalną dokumentacją:  
 [Tabela Admission Drug - eICU Collaborative Research Database](https://eicu-crd.mit.edu/eicutables/admissiondrug/)
 
 📄 Raport z projektu:  
@@ -13,33 +14,48 @@ Aby uzyskać szczegółowe informacje na temat schematu bazy danych, zapoznaj si
 
 ## 🚀 Setup
 
-Download the EICU demo dataset and place the .sqlite3 file into the `init/` folder.
+Download the EICU demo dataset and place the `.sqlite3` file into the `init/` folder.
 
 Download the [eICU Collaborative Research Database Demo (v2.0.1)](https://physionet.org/static/published-projects/eicu-crd-demo/eicu-collaborative-research-database-demo-2.0.1.zip) and extract it into the `init/` folder. Only the `.sqlite3` file is required for this project.
 
-To extract the `.zip` file on Linux and move the `.sqlite3` file to the `init/` folder, use the following commands:
+To extract the `.gz` file on Linux and move the `.sqlite3` file:
 
 ```bash
 wget -r -N -c -np https://physionet.org/content/eicu-crd-demo/2.0.1/sqlite/eicu_v2_0_1.sqlite3.gz
-```
-
-```bash
-unzip eicu_v2_0_1.sqlite3.gz -d temp_folder
-mv temp_folder/eicu_v2_0_1.sqlite3 init/
-rm -r temp_folder
+gunzip eicu_v2_0_1.sqlite3.gz
+mv eicu_v2_0_1.sqlite3 init/
 ```
 
 ---
 
-## 🐳 Running the Docker Environment
+## 🧼 1. Pre-clean the SQLite database (**required before import**)
 
-### 1. Build all containers
+Before importing the dataset into PostgreSQL, you must clean invalid values that would cause type errors during the import process.
+
+Run the cleaning script:
+
+```bash
+python3 utils/preclean_all.py
+```
+
+This script:
+- Replaces `""` with `NULL` in nullable numeric fields
+- Replaces `""` with safe defaults (like `0`) in `NOT NULL` numeric fields
+- Prints a summary of all changes and affected columns
+
+> ⚠️ **This step is mandatory.** PostgreSQL is strict about types, and without pre-cleaning, the import will fail.
+
+---
+
+## 🐳 2. Build and Run the Docker Environment
+
+### Build all containers
 
 ```bash
 docker-compose build
 ```
 
-### 2. Start the database and import the data
+### Start the database and import the data
 
 This starts PostgreSQL and runs `pgloader` to load data from SQLite into PostgreSQL:
 
@@ -47,7 +63,9 @@ This starts PostgreSQL and runs `pgloader` to load data from SQLite into Postgre
 docker-compose up -d postgres pgloader
 ```
 
-### 3. Run tests
+---
+
+## 🧪 3. Run the Test Suite
 
 To execute the full test suite after data import:
 
@@ -55,19 +73,19 @@ To execute the full test suite after data import:
 docker-compose run --rm database-tester
 ```
 
-You can also selectively run **specific test suites** using the `--suites` flag:
+You can also selectively run **specific test suites**:
 
 ```bash
 docker-compose run --rm database-tester --suites "Simple queries" "Complex queries"
 ```
 
-Use a custom query file (optional):
+To use a custom query file:
 
 ```bash
 docker-compose run --rm database-tester --file tests/my_custom_queries.json
 ```
 
-📝 **Note:**  
+📝 **Note:**
 - Test queries are defined in `test_postgres_queries.json`
 - Suite names must match the keys in that file
 
@@ -75,18 +93,17 @@ docker-compose run --rm database-tester --file tests/my_custom_queries.json
 
 ## 📊 Summary Output
 
-- After all queries are executed, a detailed **summary log** is generated.
-- The summary aggregates **all suites run in the current session**, including:
-  - Total queries
-  - Success/failure count
-  - Execution time statistics
-  - Memory/CPU usage
-  - System info
-  - List of executed test suites
+After all queries are executed, detailed logs are generated including:
 
-Logs and summaries are saved as:
-- `query_log_<timestamp>.txt`
-- `query_log_<timestamp>.summary.txt`
+- Total queries run
+- Execution time stats (avg, fastest, slowest)
+- CPU and memory usage
+- Number of failed queries
+- List of executed test suites
+
+Logs are saved as:
+- `querylog_<timestamp>.txt`
+- `querylog_<timestamp>.summary.txt`
 
 ---
 
@@ -98,21 +115,15 @@ Logs and summaries are saved as:
 docker-compose down -v
 ```
 
-This wipes persistent volumes (including the PostgreSQL database).
+This removes the PostgreSQL data volume and any test results.
 
-### Total Docker cleanup (⚠️ Warning)
-
-> ⚠️ `docker system prune` will:
-> - Remove all stopped containers
-> - Delete unused networks
-> - Delete dangling images and build cache  
-> - It may also remove volumes if not in use
-
-Proceed with caution:
+### Total Docker cleanup (⚠️ DANGEROUS)
 
 ```bash
 docker system prune
 ```
+
+> ⚠️ This deletes unused containers, networks, and build cache.
 
 ---
 
@@ -124,12 +135,15 @@ docker system prune
 ├── Dockerfile.postgres           # PostgreSQL + pgloader setup
 ├── Dockerfile.tester             # Python test runner
 ├── init/                         # SQLite DB and import script
+│   └── eicu_v2_0_1.sqlite3       # eICU demo database (required)
+├── utils/                        # Pre-cleaning scripts
+│   └── preclean_all.py           # Smart DB cleaner
 ├── tests/                        # Python scripts and query definitions
 │   ├── test_postgres.py
 │   ├── test_postgres_queries.json
 │   ├── query_executor.py
 │   └── log_utils.py
-├── docker_volumes/              # Persistent volume for PostgreSQL
+├── docker_volumes/               # Persistent volume for PostgreSQL
 └── logs/                         # Auto-generated logs after test runs
 ```
 
@@ -137,4 +151,5 @@ docker system prune
 
 ## ✅ Author Notes
 
-This environment is designed for reproducible, performance-aware database testing using realistic medical data. Feel free to fork and adapt it to other databases or query workloads.
+This environment is designed for reproducible, performance-aware database testing using realistic medical data.  
+Feel free to fork and adapt it to other databases or query workloads.
