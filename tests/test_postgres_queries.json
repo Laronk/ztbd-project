@@ -1,5 +1,5 @@
 {
-    "Test database connection": {
+    "Connectivity": {
         "queries": [
             {
                 "label": "Check PostgreSQL version",
@@ -7,55 +7,85 @@
             }
         ]
     },
-    "Simple queries": {
+    "Exploratory": {
         "queries": [
             {
-                "label": "Get a few patients data",
+                "label": "First 10 patients",
                 "query": "SELECT * FROM patient LIMIT 10;"
             },
             {
-                "label": "Get all patients older than 65",
-                "query": "SELECT * FROM patient WHERE age ~ '^[0-9]+$' AND CAST(age AS INTEGER) > 65;"
+                "label": "List unique hospitals",
+                "query": "SELECT DISTINCT hospitalid FROM patient LIMIT 10;"
             },
             {
-                "label": "Count the number of entries in the lab table",
-                "query": "SELECT COUNT(*) FROM lab;"
+                "label": "Sample diagnoses",
+                "query": "SELECT DISTINCT diagnosisstring FROM diagnosis LIMIT 10;"
             },
             {
-                "label": "List unique diagnoses",
-                "query": "SELECT DISTINCT diagnosisstring FROM diagnosis LIMIT 20;"
+                "label": "List lab test names",
+                "query": "SELECT DISTINCT labname FROM lab LIMIT 10;"
             }
         ]
     },
-    "Complex queries": {
+    "Analytical": {
         "queries": [
             {
-                "label": "Get average age of patients grouped by gender (three genders: m, f, Unknown)",
-                "query": "SELECT COALESCE(NULLIF(gender, ''), 'Unknown') AS gender, AVG(CAST(age AS INTEGER)) AS avg_age FROM patient WHERE age ~ '^[0-9]+$' GROUP BY COALESCE(NULLIF(gender, ''), 'Unknown');"
+                "label": "Average age by gender",
+                "query": "SELECT COALESCE(NULLIF(gender, ''), 'Unknown') AS gender, AVG(CAST(age AS INTEGER)) FROM patient WHERE age ~ '^[0-9]+$' GROUP BY COALESCE(NULLIF(gender, ''), 'Unknown');"
             },
             {
-                "label": "Get number of diagnoses per patient",
-                "query": "SELECT patientunitstayid, COUNT(*) AS diagnosis_count FROM diagnosis GROUP BY patientunitstayid ORDER BY diagnosis_count DESC;"
+                "label": "Top 5 most common diagnoses",
+                "query": "SELECT diagnosisstring, COUNT(*) FROM diagnosis GROUP BY diagnosisstring ORDER BY COUNT(*) DESC LIMIT 5;"
             },
             {
-                "label": "Join patient and vitalperiodic to get heart rate info",
+                "label": "Average lab result per test type",
+                "query": "SELECT labname, AVG(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult ~ '^[0-9.]+$' GROUP BY labname LIMIT 10;"
+            }
+        ]
+    },
+    "Join-heavy": {
+        "queries": [
+            {
+                "label": "Patient vitals with gender",
                 "query": "SELECT p.patientunitstayid, p.gender, v.heartrate FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid WHERE v.heartrate IS NOT NULL LIMIT 50;"
+            },
+            {
+                "label": "Lab counts by unit type",
+                "query": "SELECT pa.unittype, COUNT(l.labid) AS lab_tests FROM patient pa JOIN lab l ON pa.patientunitstayid = l.patientunitstayid GROUP BY pa.unittype;"
             }
         ]
     },
-    "Computationally simple query": {
+    "Transactional": {
         "queries": [
             {
-                "label": "Get minimum and maximum temperature from vitalperiodic",
-                "query": "SELECT MIN(temperature), MAX(temperature) FROM vitalperiodic WHERE temperature::text ~ '^[0-9.]+$';"
+                "label": "Insert and delete test patient",
+                "setup": [
+                    "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (9999999, '42', 'Male', 1);"
+                ],
+                "query": "DELETE FROM patient WHERE patientunitstayid = 9999999;"
+            },
+            {
+                "label": "Insert and delete lab entries",
+                "setup": [
+                    "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (9999999, 'Na+', '140.0');"
+                ],
+                "query": "DELETE FROM lab WHERE patientunitstayid = 9999999;"
             }
         ]
     },
-    "Computationally complex query": {
+    "Edge case / stress": {
         "queries": [
             {
-                "label": "Compute average heart rate for patients with >100 vitals entries",
-                "query": "SELECT patientunitstayid, AVG(heartrate) AS avg_hr FROM vitalperiodic WHERE heartrate::text ~ '^[0-9.]+$' GROUP BY patientunitstayid HAVING COUNT(*) > 100 ORDER BY avg_hr DESC LIMIT 20;"
+                "label": "Top 10 patients by vital count",
+                "query": "SELECT patientunitstayid, COUNT(*) FROM vitalperiodic GROUP BY patientunitstayid ORDER BY COUNT(*) DESC LIMIT 10;"
+            },
+            {
+                "label": "Extreme value vitals",
+                "query": "SELECT * FROM vitalperiodic WHERE temperature::text ~ '^[0-9.]+$' AND (temperature < 30 OR temperature > 42);"
+            },
+            {
+                "label": "Long-running join query",
+                "query": "SELECT p.patientunitstayid, COUNT(v.heartrate) FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid GROUP BY p.patientunitstayid ORDER BY COUNT(v.heartrate) DESC LIMIT 20;"
             }
         ]
     }
