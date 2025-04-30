@@ -35,13 +35,14 @@ def run_queries(test_suites, conn, logger):
     for suite_name, suite_data in test_suites.items():
         print(f"\n🔍 Running test suite: {suite_name} ({len(suite_data['queries'])} queries)")
         for item in suite_data.get("queries", []):
-            result = execute_query_safely(conn, item["label"], item["query"])
+            result = execute_query_safely(conn, item["label"], item["query"], item.get("setup", []))
             logger.log(
                 query_label=result["label"],
                 query=result["query"],
                 execution_time=result["execution_time"],
                 rowcount=result["rowcount"],
                 success=result["success"],
+                setup_queries=item.get("setup", []),
                 error_message=result["error"]
             )
 

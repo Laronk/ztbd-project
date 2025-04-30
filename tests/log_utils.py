@@ -51,7 +51,7 @@ class QueryLogger:
         with open(self.log_file, "w", encoding="utf-8") as f:
             f.write(f"--- Query Benchmark Log ({timestamp()}) ---\n\n")
 
-    def log(self, query_label, query, execution_time, rowcount, success=True, error_message=None):
+    def log(self, query_label, query, execution_time, rowcount, success=True, setup_queries=[], error_message=None):
         self.query_count += 1
         self.total_exec_time += execution_time
         self.execution_times.append(execution_time)
@@ -73,6 +73,18 @@ class QueryLogger:
             f"EXEC_TIME: {round(execution_time, 4)}s | ROWS: {rowcount} | "
             f"CPU: {round(cpu_pct, 2)}% | MEM: {round(mem_rss_mb, 2)}MB | QUERY: {query.strip()};"
         )
+
+        if setup_queries:
+            setup_types = [get_query_type(q) for q in setup_queries]
+            setup_count = len(setup_queries)
+
+            # Count each type for this specific test only
+            setup_type_counts = defaultdict(int)
+            for stype in setup_types:
+                setup_type_counts[stype] += 1
+
+            setup_type_summary = ', '.join(f'{k}: {v}' for k, v in setup_type_counts.items())
+            log_line += f" | SETUP: {setup_count} query(ies), types: {setup_type_summary}"
 
         if not success and error_message:
             log_line += f"  <-- ERROR: {error_message}"
