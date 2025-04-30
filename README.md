@@ -47,7 +47,20 @@ This script:
 
 ---
 
-## 🐳 2. Build and Run the Docker Environment
+## 🧼 2. Convert SQLite to JSON (required for MongoDB import)
+
+If you want to test using MongoDB, convert the `.sqlite3` file to JSON format first:
+
+```bash
+python3 utils/sqlite_to_json.py
+```
+
+This script exports all tables and rows to a structured `.json` file.  
+It is required for MongoDB import or testing.
+
+---
+
+## 🐳 3. Build and Run the Docker Environment
 
 ### Build all containers
 
@@ -65,7 +78,7 @@ docker-compose up -d postgres pgloader
 
 ---
 
-## 🧪 3. Run the Test Suite
+## 🧪 4. Run the Test Suite
 
 To execute the full test suite after data import:
 
@@ -138,6 +151,7 @@ docker system prune
 │   └── eicu_v2_0_1.sqlite3       # eICU demo database (required)
 ├── utils/                        # Pre-cleaning scripts
 │   └── preclean_all.py           # Smart DB cleaner
+│   └── sqlite_to_mongo.py           # mongo DB converter
 ├── tests/                        # Python scripts and query definitions
 │   ├── test_postgres.py
 │   ├── test_postgres_queries.json
