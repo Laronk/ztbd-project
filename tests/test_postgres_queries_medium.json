@@ -1,0 +1,72 @@
+{
+    "Connectivity": {
+        "queries": [
+            {
+                "label": "Check PostgreSQL version",
+                "query": "SELECT version();"
+            }
+        ]
+    },
+    "Exploratory": {
+        "queries": [
+            {
+                "label": "Patients per ward",
+                "query": "SELECT wardid, COUNT(*) FROM patient GROUP BY wardid ORDER BY COUNT(*) DESC LIMIT 10;"
+            },
+            {
+                "label": "Distinct diagnosis + hospital",
+                "query": "SELECT DISTINCT hospitalid, diagnosisstring FROM diagnosis JOIN patient USING (patientunitstayid) LIMIT 20;"
+            }
+        ]
+    },
+    "Analytical": {
+        "queries": [
+            {
+                "label": "Median admission age (approximation)",
+                "query": "SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY CAST(age AS INTEGER)) FROM patient WHERE age ~ '^[0-9]+$';"
+            },
+            {
+                "label": "Gender-disaggregated lab result averages",
+                "query": "SELECT p.gender, l.labname, AVG(CAST(l.labresult AS DOUBLE PRECISION)) AS avg_result FROM patient p JOIN lab l ON p.patientunitstayid = l.patientunitstayid WHERE l.labresult ~ '^[0-9.]+$' GROUP BY p.gender, l.labname LIMIT 20;"
+            },
+            {
+                "label": "Max lab result per patient",
+                "query": "SELECT patientunitstayid, MAX(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult ~ '^[0-9.]+$' GROUP BY patientunitstayid ORDER BY MAX(CAST(labresult AS DOUBLE PRECISION)) DESC LIMIT 10;"
+            }
+        ]
+    },
+    "Join-heavy": {
+        "queries": [
+            {
+                "label": "Diagnoses linked to lab test frequency",
+                "query": "SELECT d.diagnosisstring, COUNT(*) AS lab_tests FROM diagnosis d JOIN lab l ON d.patientunitstayid = l.patientunitstayid GROUP BY d.diagnosisstring ORDER BY lab_tests DESC LIMIT 10;"
+            },
+            {
+                "label": "Vitals timeline preview",
+                "query": "SELECT p.patientunitstayid, v.observationoffset, v.heartrate, v.temperature FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid WHERE v.observationoffset BETWEEN 0 AND 1000 ORDER BY v.observationoffset ASC LIMIT 50;"
+            },
+            {
+                "label": "Long-running join query",
+                "query": "SELECT p.patientunitstayid, COUNT(v.heartrate) FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid GROUP BY p.patientunitstayid ORDER BY COUNT(v.heartrate) DESC LIMIT 20;"
+            },
+            {
+                "label": "Highly connected patients",
+                "query": "SELECT p.patientunitstayid, (SELECT COUNT(*) FROM vitalperiodic v WHERE v.patientunitstayid = p.patientunitstayid) AS vitals, (SELECT COUNT(*) FROM diagnosis d WHERE d.patientunitstayid = p.patientunitstayid) AS dx, (SELECT COUNT(*) FROM lab l WHERE l.patientunitstayid = p.patientunitstayid) AS labs FROM patient p ORDER BY (vitals + dx + labs) DESC LIMIT 10;"
+            }
+        ]
+    },
+    "Transactional": {
+        "queries": [
+            {
+                "label": "Full lifecycle note",
+                "setup": [
+                    "INSERT INTO note (patientunitstayid, notetext) VALUES (8888888, 'Initial note');"
+                ],
+                "query_seq": [
+                    "UPDATE note SET notetext = 'Updated note' WHERE patientunitstayid = 8888888;",
+                    "DELETE FROM note WHERE patientunitstayid = 8888888;"
+                ]
+            }
+        ]
+    }
+}

@@ -78,7 +78,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--file",
-        default="test_postgres_queries.json",
+        default="test_postgres_queries_simple.json",
         help="Path to query suite JSON file"
     )
 

@@ -24,6 +24,10 @@
             {
                 "label": "List lab test names",
                 "query": "SELECT DISTINCT labname FROM lab LIMIT 10;"
+            },
+            {
+                "label": "Extreme value vitals",
+                "query": "SELECT * FROM vitalperiodic WHERE temperature::text ~ '^[0-9.]+$' AND (temperature < 30 OR temperature > 42);"
             }
         ]
     },
@@ -40,6 +44,10 @@
             {
                 "label": "Average lab result per test type",
                 "query": "SELECT labname, AVG(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult ~ '^[0-9.]+$' GROUP BY labname LIMIT 10;"
+            },
+            {
+                "label": "Top 10 patients by vital count",
+                "query": "SELECT patientunitstayid, COUNT(*) FROM vitalperiodic GROUP BY patientunitstayid ORDER BY COUNT(*) DESC LIMIT 10;"
             }
         ]
     },
@@ -70,22 +78,6 @@
                     "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (9999999, 'Na+', '140.0');"
                 ],
                 "query": "DELETE FROM lab WHERE patientunitstayid = 9999999;"
-            }
-        ]
-    },
-    "Edge case / stress": {
-        "queries": [
-            {
-                "label": "Top 10 patients by vital count",
-                "query": "SELECT patientunitstayid, COUNT(*) FROM vitalperiodic GROUP BY patientunitstayid ORDER BY COUNT(*) DESC LIMIT 10;"
-            },
-            {
-                "label": "Extreme value vitals",
-                "query": "SELECT * FROM vitalperiodic WHERE temperature::text ~ '^[0-9.]+$' AND (temperature < 30 OR temperature > 42);"
-            },
-            {
-                "label": "Long-running join query",
-                "query": "SELECT p.patientunitstayid, COUNT(v.heartrate) FROM patient p JOIN vitalperiodic v ON p.patientunitstayid = v.patientunitstayid GROUP BY p.patientunitstayid ORDER BY COUNT(v.heartrate) DESC LIMIT 20;"
             }
         ]
     }
