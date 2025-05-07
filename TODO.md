@@ -20,10 +20,6 @@
   Extend summary logs to include avg/min/max query time per suite.
 
 ## Other
-- [ ] **Translate data from .sqlite3 to mongoDB format**
-
-- [ ] **Write test queries**
-
 - [ ] **Perform test query result analysis**
 
 - [ ] **Translate the queries from postgres to mongoDB format**
