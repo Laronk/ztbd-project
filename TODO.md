@@ -9,13 +9,12 @@
 
 - [ ] **Parallel Query Execution Feature**
   <!-- Core Logic -->
-  - [ ] Add support for `"run_parallel": true` flag in JSON queries
-  - [ ] Ensure only queries inside a dedicated test suite (e.g. `"Parallel Execution Tests"`) are treated as parallel
-  - [ ] Validate required fields:
-    - [ ] `simulated_client_number` (int, ≥ 2)
-    - [ ] `queries_per_time` (int, ≥ 1)
-    - [ ] `execution_loop_time_ms` (int, ≥ 100)
-  - [ ] Finall parallel query test definition has to follow the template:
+  - [x] Add support for `"run_parallel": true` flag in JSON queries
+  - [x] Validate required fields:
+    - [x] `simulated_client_number` (int, ≥ 2)
+    - [x] `queries_per_time` (int, ≥ 1)
+    - [x] `execution_loop_time_ms` (int, ≥ 100)
+  - [x] Finall parallel query test definition has to follow the template:
   ```json
   {
     "Parallel Stress Tests": {
