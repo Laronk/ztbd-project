@@ -64,8 +64,8 @@
   - [ ] Indicate if query was run in parallel in log line
   - [ ] Ensure logging is thread-safe (`threading.Lock` if needed)
   <!-- Testing & Debug -->
-  - [ ] Create a test suite category `"Parallel Execution Tests"` in `.json`
-  - [ ] Include sample queries with all new required flags
+  - [x] Create a test suite category `"Parallel"` in `.json`
+  - [x] Include sample queries with all new required flags
   - [ ] Verify behavior with both valid and invalid configs
   - [ ] Verify query results are consistent across threads (if applicable)
 
