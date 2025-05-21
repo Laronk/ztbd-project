@@ -5,6 +5,9 @@ import argparse
 from log_utils import QueryLogger
 from query_executor import execute_query_safely
 
+from config import (
+    POSTGRESQL_CONFIG
+)
 
 def load_queries(filepath):
     if not os.path.exists(filepath):
@@ -14,11 +17,11 @@ def load_queries(filepath):
 
 
 def connect_to_postgres():
-    host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", 5432)
-    dbname = os.getenv("DB_NAME", "mydb")
-    user = os.getenv("DB_USER", "myuser")
-    password = os.getenv("DB_PASSWORD", "mypassword")
+    host = POSTGRESQL_CONFIG["host"]
+    port = POSTGRESQL_CONFIG["port"]
+    dbname = POSTGRESQL_CONFIG["database"]
+    user = POSTGRESQL_CONFIG["user"]
+    password = POSTGRESQL_CONFIG["password"]
 
     print(f"🔌 Connecting to PostgreSQL at {host}:{port} (db: {dbname}, user: {user})")
 

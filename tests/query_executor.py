@@ -5,9 +5,10 @@ from reset_db import reset_database
 from log_utils import get_query_type
 from validators import validate_simulated_client_number, validate_queries_per_time, validate_execution_loop_time_ms
 
-
-ROLLBACK_INCOMPATIBLE = {"CREATE", "DROP", "ALTER", "VACUUM", "GRANT", "REVOKE"}
-PARALLEL_EXECUTION_ALLOWED = {"SELECT", "INSERT", "UPDATE", "DELETE"}
+from config import (
+    ROLLBACK_INCOMPATIBLE,
+    PARALLEL_EXECUTION_ALLOWED,
+)
 
 
 def is_rollback_safe(queries):
