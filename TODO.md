@@ -7,8 +7,6 @@
 - [ ] **Support for setup queries per test case**  
   Enable pre-test setup actions (e.g. insert test data), and restore the base DB state after each test/suite.
 
-- [ ] **Create a config.py file with project configuration**
-
 - [ ] **Parallel Query Execution Feature**
   <!-- Core Logic -->
   - [x] Add support for `"run_parallel": true` flag in JSON queries
@@ -48,15 +46,15 @@
     - [ ] Records execution time for each iteration
   - [ ] Aggregate per-thread performance metrics after execution
   <!-- Restrictions & Safety -->
-  - [ ] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
+  - [x] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
     - `SELECT`, `INSERT`, `UPDATE`, `DELETE`
-  - [ ] Skip or warn if disallowed query types are found in a parallel block
+  - [x] Skip or warn if disallowed query types are found in a parallel block
   - [ ] Cap max threads to avoid overloading the DB (e.g. `MAX_PARALLEL_QUERIES`)
     - [ ] Write a general test system config file in python
   <!-- Setup Queries & Validation -->
-  - [ ] Allow `setup` field for parallel queries (must run once before threads)
-  - [ ] Validate `setup` query types against exclusion list
-  - [ ] Log setup phase execution and failure (if any)
+  - [x] Allow `setup` field for parallel queries (must run once before threads)
+  - [x] Validate `setup` query types against exclusion list
+  - [x] Log setup phase execution and failure (if any)
   <!-- Logging Enhancements -->
   - [ ] Log per-thread execution time (min, max, avg)
   - [ ] Log total simulated clients
