@@ -46,8 +46,8 @@
     - [ ] Records execution time for each iteration
   - [ ] Aggregate per-thread performance metrics after execution
   <!-- Restrictions & Safety -->
-  - [ ] Create a `PARALLEL_EXECUTION_EXCLUDED` set with disallowed query types:
-    - `CREATE`, `DROP`, `ALTER`, `VACUUM`, `GRANT`, `REVOKE`
+  - [ ] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
+    - `SELECT`, `INSERT`, `UPDATE`, `DELETE`
   - [ ] Skip or warn if disallowed query types are found in a parallel block
   - [ ] Cap max threads to avoid overloading the DB (e.g. `MAX_PARALLEL_QUERIES`)
     - [ ] Write a general test system config file in python
