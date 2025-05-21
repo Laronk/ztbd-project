@@ -60,7 +60,7 @@
   - [ ] Log total simulated clients
   - [ ] Log total number of query executions
   - [ ] Indicate if query was run in parallel in log line
-  - [ ] Ensure logging is thread-safe (`threading.Lock` if needed)
+  - [x] Ensure logging is thread-safe (`threading.Lock` if needed)
   <!-- Testing & Debug -->
   - [x] Create a test suite category `"Parallel"` in `.json`
   - [x] Include sample queries with all new required flags
