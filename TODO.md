@@ -17,7 +17,7 @@
   - [x] Finall parallel query test definition has to follow the template:
   ```json
   {
-    "Parallel Stress Tests": {
+    "Parallel": {
       "queries": [
         {
           "label": "Simulated lab session per client",
@@ -39,11 +39,11 @@
   }
   ```
   <!-- Thread Execution & Control -->
-  - [ ] Spawn one thread per simulated client
-  - [ ] Each thread:
-    - [ ] Executes the query `queries_per_time` times
-    - [ ] Sleeps appropriately to respect `execution_loop_time_ms`
-    - [ ] Records execution time for each iteration
+  - [x] Spawn one thread per simulated client
+  - [x] Each thread:
+    - [x] Executes the query `queries_per_time` times
+    - [x] Sleeps appropriately to respect `execution_loop_time_ms`
+    - [x] Records execution time for each iteration
   - [ ] Aggregate per-thread performance metrics after execution
   <!-- Restrictions & Safety -->
   - [x] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
