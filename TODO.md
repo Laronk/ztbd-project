@@ -49,8 +49,8 @@
   - [x] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
     - `SELECT`, `INSERT`, `UPDATE`, `DELETE`
   - [x] Skip or warn if disallowed query types are found in a parallel block
-  - [ ] Cap max threads to avoid overloading the DB (e.g. `MAX_PARALLEL_QUERIES`)
-    - [ ] Write a general test system config file in python
+  - [x] Cap max threads to avoid overloading the DB (e.g. `MAX_PARALLEL_QUERIES`)
+    - [x] Write a general test system config file in python
   <!-- Setup Queries & Validation -->
   - [x] Allow `setup` field for parallel queries (must run once before threads)
   - [x] Validate `setup` query types against exclusion list

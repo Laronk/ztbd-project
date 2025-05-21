@@ -1,3 +1,5 @@
+from config import MAX_PARALLEL_QUERIES
+
 # client number has to be specified
 # client number has to be an integer
 # client number has to be greater-equal than 2
@@ -20,6 +22,8 @@ def validate_queries_per_time(value):
         return False, "'queries_per_time' must be an integer"
     if value < 1:
         return False, "'queries_per_time' must be ≥ 1"
+    if value > MAX_PARALLEL_QUERIES:
+        return False, f"'queries_per_time' must be ≤ {MAX_PARALLEL_QUERIES}"
     return True, None
 
 # execution loop time has to be specified
