@@ -31,11 +31,11 @@ def connect_to_postgres():
     )
 
 
-def run_queries(test_suites, conn, logger):
+def run_queries(test_suites, conn_func, logger):
     for suite_name, suite_data in test_suites.items():
         print(f"\n🔍 Running test suite: {suite_name} ({len(suite_data['queries'])} queries)")
         for item in suite_data.get("queries", []):
-            result = execute_query_safely(conn, item["label"], item["query"], item.get("setup", []))
+            result = execute_query_safely(conn_func, item)
             logger.log(
                 query_label=result["label"],
                 query=result["query"],
@@ -61,11 +61,9 @@ def run_test_suite(queries_file, selected_suites=None):
             return
         test_suites = filtered
 
-    conn = connect_to_postgres()
     logger = QueryLogger()
     logger.suites_run = list(test_suites.keys())  # <- For summary logging
-    run_queries(test_suites, conn, logger)
-    conn.close()
+    run_queries(test_suites, connect_to_postgres, logger)
     logger.finish()
 
 

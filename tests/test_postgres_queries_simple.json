@@ -80,5 +80,24 @@
                 "query": "DELETE FROM lab WHERE patientunitstayid = 9999999;"
             }
         ]
+    },
+    "Parallel": {
+        "queries": [
+            {
+                "label": "Simulated lab session per client",
+                "run_parallel": true,
+                "setup": [
+                    "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (7777777, '30', 'Other', 5);"
+                ],
+                "query_seq": [
+                    "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (7777777, 'Na+', '137.0');",
+                    "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (7777777, 'K+', '4.5');",
+                    "DELETE FROM lab WHERE patientunitstayid = 7777777 AND labname IN ('Na+', 'K+');"
+                ],
+                "simulated_client_number": 3,
+                "queries_per_time": 2,
+                "execution_loop_time_ms": 1000
+            }
+        ]
     }
 }
