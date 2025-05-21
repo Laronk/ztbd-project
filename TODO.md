@@ -7,6 +7,8 @@
 - [ ] **Support for setup queries per test case**  
   Enable pre-test setup actions (e.g. insert test data), and restore the base DB state after each test/suite.
 
+- [ ] **Create a config.py file with project configuration**
+
 - [ ] **Parallel Query Execution Feature**
   <!-- Core Logic -->
   - [x] Add support for `"run_parallel": true` flag in JSON queries
