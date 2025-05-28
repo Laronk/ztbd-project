@@ -23,7 +23,7 @@
   - [x] The skip reason should be logged (if provided)
   - [x] Skipped query count should be logged
  
-- [ ] **Support for setup queries per test case**  
+- [x] **Support for setup queries per test case**  
   Enable pre-test setup actions (e.g. insert test data), and restore the base DB state after each test/suite.
 
 - [ ] **Parallel Query Execution Feature**
