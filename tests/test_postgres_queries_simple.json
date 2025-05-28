@@ -55,7 +55,6 @@
             },
             {
                 "label": "Average lab result per test type",
-                "setup": [],
                 "query": "SELECT labname, AVG(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult ~ '^[0-9.]+$' GROUP BY labname LIMIT 10;"
             },
             {

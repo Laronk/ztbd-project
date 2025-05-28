@@ -101,3 +101,11 @@
 - [ ] **Perform test query result analysis**
 
 - [ ] **Translate the queries from postgres to mongoDB format**
+
+- [ ] Diagram ERD
+
+- [ ] Finish project raport
+
+- [ ] Create final project prezentation
+
+- [ ] Write grater number of and more apropriate parallel tests
