@@ -76,7 +76,7 @@ docker-compose run --rm database-tester
 You can also selectively run **specific test suites**:
 
 ```bash
-docker-compose run --rm database-tester --suites "Simple queries" "Complex queries"
+docker-compose run --rm database-tester --suites "Exploratory" "Analytical"
 ```
 
 To use a custom query file:
