@@ -1,8 +1,35 @@
 # 📋 Project TODO
 
 ## Test Execution Enhancements
-- [ ] **Add test activation toggle**  
-  Allow individual tests or test suites to be conditionally executed (e.g. via `"enabled": true/false` flag in JSON).
+- [ ] **Add test skipping mechanism (`"skip"` key)**  
+  Support conditional skipping of individual tests or entire test suites using a `"skip"` flag in JSON.
+  
+  - [ ] The `"skip"` field can be either:
+    - [ ] `true` – skips the test silently
+    - [ ] A string – skips the test with the string shown as a skip reason
+
+  #### 🧪 Examples:
+  - **Skipping a single test:**
+    ```json
+    {
+      "label": "Some deprecated query",
+      "skip": "Deprecated test — no longer relevant",
+      "query": "SELECT * FROM old_table;"
+    }
+    ```
+
+  - **Skipping an entire suite:**
+    ```json
+    "Exploratory Tests": {
+      "skip": true,
+      "queries": [
+        ...
+      ]
+    }
+    ```
+  - [ ] Skipped tests and suites should be reported in console/log output.
+  - [ ] Skipped tests should not execute setup or query code.
+  - [ ] The skip reason should be logged (if provided).
 
 - [ ] **Support for setup queries per test case**  
   Enable pre-test setup actions (e.g. insert test data), and restore the base DB state after each test/suite.
