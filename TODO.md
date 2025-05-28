@@ -1,12 +1,13 @@
 # 📋 Project TODO
 
 ## Test Execution Enhancements
-- [ ] **Add test skipping mechanism (`"skip"` key)**  
+- [x] **Add test skipping mechanism (`"skip"` key)**  
   Support conditional skipping of individual tests or entire test suites using a `"skip"` flag in JSON.
   
-  - [ ] The `"skip"` field can be either:
-    - [ ] `true` – skips the test silently
-    - [ ] A string – skips the test with the string shown as a skip reason
+  - [x] The skipping of entire test suits can be achieved by selectively running only chosen test suits
+  - [x] The `"skip"` field can be either:
+    - [x] `true` – skips the test silently
+    - [x] A string – skips the test with the string shown as a skip reason
 
   #### 🧪 Examples:
   - **Skipping a single test:**
@@ -17,20 +18,11 @@
       "query": "SELECT * FROM old_table;"
     }
     ```
-
-  - **Skipping an entire suite:**
-    ```json
-    "Exploratory Tests": {
-      "skip": true,
-      "queries": [
-        ...
-      ]
-    }
-    ```
-  - [ ] Skipped tests and suites should be reported in console/log output.
-  - [ ] Skipped tests should not execute setup or query code.
-  - [ ] The skip reason should be logged (if provided).
-
+  - [x] Skipped tests should be reported in console/log output.
+  - [x] Skipped tests should not execute setup or query code.
+  - [x] The skip reason should be logged (if provided)
+  - [x] Skipped query count should be logged
+ 
 - [ ] **Support for setup queries per test case**  
   Enable pre-test setup actions (e.g. insert test data), and restore the base DB state after each test/suite.
 

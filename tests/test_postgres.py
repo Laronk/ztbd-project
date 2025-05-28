@@ -38,6 +38,25 @@ def run_queries(test_suites, conn_func, logger):
     for suite_name, suite_data in test_suites.items():
         print(f"\n🔍 Running test suite: {suite_name} ({len(suite_data['queries'])} queries)")
         for item in suite_data.get("queries", []):
+            skip_reason = item.get("skip")
+            query_label = item.get("label")
+            if skip_reason:
+                if isinstance(skip_reason, str) or isinstance(skip_reason, bool):
+                    pass
+                else:
+                    print(f"skip_reason: {skip_reason}")
+                    raise ValueError(
+                        f"Invalid skip reason for query '{query_label}': {skip_reason}. "
+                        "Must be a string detailing the skip reason or boolean."
+                    )
+            	
+                
+                msg = f"Skipping test: {query_label}"
+                if isinstance(skip_reason, str):
+                    msg += f" | Reason: {skip_reason}"
+                print(msg)
+                logger.log_skip(f"{query_label}", reason=skip_reason)
+
             result = execute_query_safely(conn_func, item)
             logger.log(
                 query_label=result["label"],

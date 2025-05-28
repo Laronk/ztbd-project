@@ -34,6 +34,7 @@ def get_query_type(query):
 
 class QueryLogger:
     def __init__(self, log_file=None):
+        self.skipped_query_count = 0
         self.suites_run = []
         self.log_file = log_file or get_log_filename()
         self.start_time = time.time()
@@ -91,6 +92,22 @@ class QueryLogger:
 
         with open(self.log_file, "a", encoding="utf-8") as f:
             f.write(log_line + "\n")
+    
+    def log_skip(self, query_label, reason=None):
+        self.skipped_query_count += 1
+        log_line = (
+            f"{timestamp()} | _SKIPPED_ | NAME: {query_label}"
+        )
+        
+        if isinstance(reason, str):
+            log_line += f" | REASON: {reason}"
+        elif reason is True:
+            log_line += f" | REASON: --"
+        elif reason is not None:
+            log_line += f" | REASON: invalid skip reason type ({type(reason).__name__})"
+        
+        with open(self.log_file, "a", encoding="utf-8") as f:
+            f.write(log_line + "\n")
 
     def finish(self):
         import statistics
@@ -116,6 +133,7 @@ class QueryLogger:
             "\n--- Total Summary ---\n"
             f"Timestamp: {timestamp()}\n"
             f"Suites Run: {', '.join(self.suites_run)}\n"
+            f"Suites Skipped: {self.skipped_query_count}\n"
             f"Total Queries Run: {self.query_count}\n"
             f"Total Test Suite Time: {duration:.6f} sec\n"
             f"Total Query Time (cumulative): {self.total_exec_time:.6f} sec\n"

@@ -11,6 +11,7 @@
         "queries": [
             {
                 "label": "First 10 patients",
+                "skip": true,
                 "setup": [
                     "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (1000001, '45', 'Male', 1);",
                     "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (1000002, '34', 'Female', 2);",
@@ -22,6 +23,7 @@
             },
             {
                 "label": "List unique hospitals",
+                "skip": false,
                 "query": "SELECT DISTINCT hospitalid FROM patient LIMIT 10;"
             },
             {
@@ -30,6 +32,7 @@
             },
             {
                 "label": "List lab test names",
+                "skip": "This is a test skip reason",
                 "query": "SELECT DISTINCT labname FROM lab LIMIT 10;"
             },
             {
