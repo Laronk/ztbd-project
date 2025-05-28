@@ -63,7 +63,6 @@
     - [x] Executes the query `queries_per_time` times
     - [x] Sleeps appropriately to respect `execution_loop_time_ms`
     - [x] Records execution time for each iteration
-  - [ ] Aggregate per-thread performance metrics after execution
   <!-- Restrictions & Safety -->
   - [x] Create a `PARALLEL_EXECUTION_ALLOWED` set with disallowed query types:
     - `SELECT`, `INSERT`, `UPDATE`, `DELETE`
@@ -77,8 +76,8 @@
   <!-- Logging Enhancements -->
   - [ ] Log per-thread execution time (min, max, avg)
   - [ ] Log total simulated clients
-  - [ ] Log total number of query executions
-  - [ ] Indicate if query was run in parallel in log line
+  - [ ] Log total number of tests executions for parallel and regular
+  - [x] Indicate if query was run in parallel in log line
   - [x] Ensure logging is thread-safe (`threading.Lock` if needed)
   <!-- Testing & Debug -->
   - [x] Create a test suite category `"Parallel"` in `.json`

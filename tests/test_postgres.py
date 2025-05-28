@@ -58,15 +58,32 @@ def run_queries(test_suites, conn_func, logger):
                 logger.log_skip(f"{query_label}", reason=skip_reason)
 
             result = execute_query_safely(conn_func, item)
-            logger.log(
-                query_label=result["label"],
-                query=result["query"],
-                execution_time=result["execution_time"],
-                rowcount=result["rowcount"],
-                success=result["success"],
-                setup_queries=item.get("setup", []),
-                error_message=result["error"]
-            )
+            test_type = result["type"]
+            if test_type.lower() == "PARALLEL".lower():
+                logger.log_parallel_test(
+                    query_label=result["label"],
+                    query_type=result["type"],
+                    query=result["query"],
+                    execution_time=result["execution_time"],
+                    min_time=result["min_time"],
+                    max_time=result["max_time"],
+                    avg_time=result["avg_time"],
+                    rowcount=result["rowcount"],
+                    success=result["success"],
+                    setup_queries=item.get("setup", []),
+                    error_message=result["error"]
+                )
+            else:
+                logger.log_regualar_test(
+                    query_label=result["label"],
+                    query_type=result["type"],
+                    query=result["query"],
+                    execution_time=result["execution_time"],
+                    rowcount=result["rowcount"],
+                    success=result["success"],
+                    setup_queries=item.get("setup", []),
+                    error_message=result["error"]
+                )
 
 
 def run_test_suite(queries_file, selected_suites=None):

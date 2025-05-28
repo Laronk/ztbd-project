@@ -34,11 +34,11 @@ def get_query_type(query):
 
 class QueryLogger:
     def __init__(self, log_file=None):
-        self.skipped_query_count = 0
+        self.skipped_test_count = 0
+        self.run_tests_count = 0
         self.suites_run = []
         self.log_file = log_file or get_log_filename()
         self.start_time = time.time()
-        self.query_count = 0
         self.fail_count = 0
         self.total_exec_time = 0.0
         self.execution_times = []
@@ -52,16 +52,15 @@ class QueryLogger:
         with open(self.log_file, "w", encoding="utf-8") as f:
             f.write(f"--- Query Benchmark Log ({timestamp()}) ---\n\n")
 
-    def log(self, query_label, query, execution_time, rowcount, success=True, setup_queries=[], error_message=None):
-        self.query_count += 1
+    def log_parallel_test(self, query_label, query_type, query, execution_time, min_time, max_time, avg_time, rowcount, success=True, setup_queries=[], error_message=None):
+        self.run_tests_count += 1
         self.total_exec_time += execution_time
-        self.execution_times.append(execution_time)
+        # TODO: Calculate execution time stats for parallel tests separately 
+        # self.execution_times.append(execution_time)
         if not success:
             self.fail_count += 1
 
-        query_type = get_query_type(query)
-        self.by_type[query_type].append(execution_time)
-
+        # TODO: check correct processing of CPU and memory usage 
         cpu_pct = self.process.cpu_percent(interval=0.1)
         mem_rss_mb = self.process.memory_info().rss / (1024 * 1024)
 
@@ -70,9 +69,50 @@ class QueryLogger:
 
         # Ordered log format:
         log_line = (
-            f"{timestamp()} | [{query_type}] | SUCCESS: {success} | QUERY_NAME: {query_label} | "
+            f"{timestamp()} | _{query_type.upper()}_ | SUCCESS: {success} | QUERY_NAME: {query_label} | "
+            f"EXEC_TOTAL_TIME: {round(execution_time, 4)}s | EXEC_MIN_TIME: {round(min_time, 4)}s | EXEC_MAX_TIME: {round(max_time, 4)}s | EXEC_AVG_TIME: {round(avg_time, 4)}s | ROWS: {rowcount} | "
+            f"CPU: {round(cpu_pct, 2)}% | MEM: {round(mem_rss_mb, 2)}MB | QUERY: {query.strip()}"
+        )
+
+        if setup_queries:
+            setup_types = [get_query_type(q) for q in setup_queries]
+            setup_count = len(setup_queries)
+
+            # Count each type for this specific test only
+            setup_type_counts = defaultdict(int)
+            for stype in setup_types:
+                setup_type_counts[stype] += 1
+
+            setup_type_summary = ', '.join(f'{k}: {v}' for k, v in setup_type_counts.items())
+            log_line += f" | SETUP: {setup_count} query(ies), types: {setup_type_summary}"
+
+        if not success and error_message:
+            log_line += f"  <-- ERROR: {error_message}"
+
+        with open(self.log_file, "a", encoding="utf-8") as f:
+            f.write(log_line + "\n")
+
+    def log_regualar_test(self, query_label, query_type, query, execution_time, rowcount, success=True, setup_queries=[], error_message=None):
+        self.run_tests_count += 1
+        self.total_exec_time += execution_time
+        self.execution_times.append(execution_time)
+        if not success:
+            self.fail_count += 1
+
+        self.by_type[query_type].append(execution_time)
+
+        # TODO: check correct processing of CPU and memory usage 
+        cpu_pct = self.process.cpu_percent(interval=0.1)
+        mem_rss_mb = self.process.memory_info().rss / (1024 * 1024)
+
+        self.cpu_usages.append(cpu_pct)
+        self.memory_usages.append(mem_rss_mb)
+
+        # Ordered log format:
+        log_line = (
+            f"{timestamp()} | [{query_type.upper()}] | SUCCESS: {success} | QUERY_NAME: {query_label} | "
             f"EXEC_TIME: {round(execution_time, 4)}s | ROWS: {rowcount} | "
-            f"CPU: {round(cpu_pct, 2)}% | MEM: {round(mem_rss_mb, 2)}MB | QUERY: {query.strip()};"
+            f"CPU: {round(cpu_pct, 2)}% | MEM: {round(mem_rss_mb, 2)}MB | QUERY: {query.strip()}"
         )
 
         if setup_queries:
@@ -94,7 +134,7 @@ class QueryLogger:
             f.write(log_line + "\n")
     
     def log_skip(self, query_label, reason=None):
-        self.skipped_query_count += 1
+        self.skipped_test_count += 1
         log_line = (
             f"{timestamp()} | _SKIPPED_ | NAME: {query_label}"
         )
@@ -114,7 +154,7 @@ class QueryLogger:
         import time
 
         duration = time.time() - self.start_time
-        avg_time = self.total_exec_time / self.query_count if self.query_count else 0
+        avg_time = self.total_exec_time / self.run_tests_count if self.run_tests_count else 0
         slowest = max(self.execution_times) if self.execution_times else 0
         fastest = min(self.execution_times) if self.execution_times else 0
 
@@ -133,13 +173,16 @@ class QueryLogger:
             "\n--- Total Summary ---\n"
             f"Timestamp: {timestamp()}\n"
             f"Suites Run: {', '.join(self.suites_run)}\n"
-            f"Suites Skipped: {self.skipped_query_count}\n"
-            f"Total Queries Run: {self.query_count}\n"
+            f"Tests Skipped: {self.skipped_test_count}\n"
+            f"Total Tests Run: {self.run_tests_count}\n"
             f"Total Test Suite Time: {duration:.6f} sec\n"
             f"Total Query Time (cumulative): {self.total_exec_time:.6f} sec\n"
+            # TODO: implement correct measurements logging for parallel and regular tests
+            f"..... Avg, Min, Max exec times for all REGULAR tests .....\n"
             f"Average Query Time: {avg_time:.6f} sec\n"
             f"Fastest Query Time: {fastest:.6f} sec\n"
             f"Slowest Query Time: {slowest:.6f} sec\n"
+            f".............................................\n"
             f"Failed Queries: {self.fail_count}\n"
             f"Median Time by Query Type: { {k: round(v, 6) for k, v in median_by_type.items()} }\n"
             f"Average CPU Usage: {sum(self.cpu_usages) / len(self.cpu_usages):.6f}%\n"

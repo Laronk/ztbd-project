@@ -123,6 +123,7 @@ def execute_parallel_query(
     print(f"Clients: {simulated_client_number}, QPT: {queries_per_time}, Interval: {execution_loop_time} ms")
     print(f"Setup queries: {len(setup or [])}, Query sequence: {len(query_seq)} queries")
 
+    query_type = "PARALLEL"
     # Validate fields
     for validator, value in [
         (validate_simulated_client_number, simulated_client_number),
@@ -133,8 +134,8 @@ def execute_parallel_query(
         if not ok:
             return {
                 "label": query_label,
-                "query": "[PARALLEL]",
-                "type": "PARALLEL",
+                "query": " ".join(query_seq),
+                "type": query_type,
                 "success": False,
                 "error": f"❌ {err}",
                 "rowcount": -1,
@@ -147,8 +148,8 @@ def execute_parallel_query(
         if qtype not in PARALLEL_EXECUTION_ALLOWED:
             return {
                 "label": query_label,
-                "query": "[PARALLEL]",
-                "type": "PARALLEL",
+                "query": " ".join(query_seq),
+                "type": query_type,
                 "success": False,
                 "error": f"❌ Query type '{qtype}' not allowed in parallel execution",
                 "rowcount": -1,
@@ -160,8 +161,8 @@ def execute_parallel_query(
     if not ok:
         return {
             "label": query_label,
-            "query": "[PARALLEL]",
-            "type": "PARALLEL",
+            "query": " ".join(query_seq),
+            "type": query_type,
             "success": False,
             "error": f"❌ Setup failed: {setup_error}",
             "rowcount": -1,
@@ -190,8 +191,8 @@ def execute_parallel_query(
 
     return {
         "label": query_label,
-        "query": "[PARALLEL]",
-        "type": "PARALLEL",
+        "query": " ".join(query_seq),
+        "type": query_type,
         "success": len(errors) == 0,
         "error": errors if errors else None,
         "rowcount": len(durations),
