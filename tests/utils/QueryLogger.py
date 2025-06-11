@@ -31,7 +31,10 @@ class QueryLogger:
         with open(self.log_file, "w", encoding="utf-8") as f:
             f.write(f"Run Test Time ID: {self.log_file_id}\n")
             f.write(f"Test File Name: {self.test_file_name}\n")
-            f.write(f"Selected Suites: {', '.join(self.selected_suites)}\n")
+            if self.selected_suites:
+                f.write(f"Selected Suites: {', '.join(self.selected_suites)}\n")
+            else:
+                f.write("All Suites Selected\n")
             f.write(f"--- Test Query Log ---\n\n")
 
     def _collect_resource_usage(self):
@@ -141,9 +144,15 @@ class QueryLogger:
 
         sys_info = get_system_info()
 
+
+        if self.selected_suites:
+            selected_suites_str = f"Selected Suites: {', '.join(self.selected_suites)}\n"
+        else:
+            selected_suites_str = "All Suites Selected\n"
+        
         summary = (
             f"Test File Name: {self.test_file_name}\n"
-            f"Selected Suites: {', '.join(self.selected_suites)}\n"
+            f"{selected_suites_str}"
             f"Run Test Time ID: {self.log_file_id}\n"
             f"--- Test Summary ---\n\n"
             "--- System Info ---\n"

@@ -104,7 +104,8 @@ def run_test_suite(queries_file, selected_suites=None):
     logger = QueryLogger(
         timestamp_id=timestamp(),
         test_file_name=get_file_name_from_path(queries_file),
-        selected_suites=selected_suites
+        # if selected_suites is iterable then selected_suites else empty list
+        selected_suites=selected_suites if isinstance(selected_suites, list) else []
     )
     logger.suites_run = list(test_suites.keys()) # <- For summary logging
     run_queries(test_suites, connect_to_postgres, logger)
