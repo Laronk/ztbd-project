@@ -2,7 +2,7 @@ import psycopg2
 import json
 import os
 import argparse
-from log_utils import QueryLogger
+from utils.QueryLogger import QueryLogger
 from query_executor import execute_query_safely
 
 from config import (
@@ -74,7 +74,7 @@ def run_queries(test_suites, conn_func, logger):
                     error_message=result["error"]
                 )
             else:
-                logger.log_regualar_test(
+                logger.log_regular_test(
                     query_label=result["label"],
                     query_type=result["type"],
                     query=result["query"],

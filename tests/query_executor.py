@@ -2,7 +2,7 @@ import time
 import statistics
 import threading
 from reset_db import reset_database
-from log_utils import get_query_type
+from utils.log_utils import get_query_type
 from validators import validate_simulated_client_number, validate_queries_per_time, validate_execution_loop_time_ms
 
 from config import (

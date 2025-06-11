@@ -6,3 +6,4 @@ init/backup__eicu_v2_0_1.sqlite3
 schema_with_foreign_keys.sql
 .gitignore
 schema.sql
+**/__pycache__/*
