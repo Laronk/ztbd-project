@@ -3,6 +3,7 @@ import json
 import os
 import argparse
 from utils.QueryLogger import QueryLogger
+from utils.log_utils import get_file_name_from_path, timestamp
 from query_executor import execute_query_safely
 
 from config import (
@@ -100,8 +101,12 @@ def run_test_suite(queries_file, selected_suites=None):
             return
         test_suites = filtered
 
-    logger = QueryLogger()
-    logger.suites_run = list(test_suites.keys())  # <- For summary logging
+    logger = QueryLogger(
+        timestamp_id=timestamp(),
+        test_file_name=get_file_name_from_path(queries_file),
+        selected_suites=selected_suites
+    )
+    logger.suites_run = list(test_suites.keys()) # <- For summary logging
     run_queries(test_suites, connect_to_postgres, logger)
     logger.finish()
 
@@ -115,7 +120,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--file",
-        default="test_postgres_queries_simple.json",
         help="Path to query suite JSON file"
     )
 

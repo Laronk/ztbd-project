@@ -31,3 +31,10 @@ def timestamp():
 
 def get_query_type(query):
     return query.strip().split()[0].upper()
+
+
+def get_file_name_from_path(path):
+    # returns file name with extension from a given file path
+    # gives rest of path after last slash
+    return os.path.basename(path)
+    

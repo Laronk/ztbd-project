@@ -6,7 +6,12 @@ from .log_utils import get_query_type, get_system_info, timestamp, get_log_filen
 
 
 class QueryLogger:
-    def __init__(self, log_file=None):
+    def __init__(self, timestamp_id: str, test_file_name: str, selected_suites: str, log_file=None):
+        # test identifier
+        self.log_file_id = timestamp_id
+        self.test_file_name = test_file_name
+        self.selected_suites = selected_suites
+        # collected data
         self.skipped_test_count = 0
         self.run_tests_count = 0
         self.suites_run = []
@@ -24,7 +29,10 @@ class QueryLogger:
 
     def _init_log(self):
         with open(self.log_file, "w", encoding="utf-8") as f:
-            f.write(f"--- Query Benchmark Log ({timestamp()}) ---\n\n")
+            f.write(f"Run Test Time ID: {self.log_file_id}\n")
+            f.write(f"Test File Name: {self.test_file_name}\n")
+            f.write(f"Selected Suites: {', '.join(self.selected_suites)}\n")
+            f.write(f"--- Test Query Log ---\n\n")
 
     def _collect_resource_usage(self):
         cpu_pct = self.process.cpu_percent(interval=0.1)
@@ -134,6 +142,10 @@ class QueryLogger:
         sys_info = get_system_info()
 
         summary = (
+            f"Test File Name: {self.test_file_name}\n"
+            f"Selected Suites: {', '.join(self.selected_suites)}\n"
+            f"Run Test Time ID: {self.log_file_id}\n"
+            f"--- Test Summary ---\n\n"
             "--- System Info ---\n"
             f"CPU: {sys_info['CPU']}\n"
             f"CPU Cores: {sys_info['CPU_CORES']}\n"
@@ -145,18 +157,18 @@ class QueryLogger:
             f"Total Tests Run: {self.run_tests_count}\n"
             f"Total Test Suite Time: {duration:.6f} sec\n"
             f"Total Query Time (cumulative regular+parallel): {self.total_exec_time:.6f} sec\n"
-            f"--- REGULAR QUERY STATS ---\n"
+            f"\n--- REGULAR QUERY STATS ---\n"
             f"Total Tests: {len(self.regualar_execution_times)}\n"
             f"Total Time: {sum(self.regualar_execution_times):.4f} sec\n"
-            f"Average Query Time: {self.total_exec_time / self.run_tests_count if self.run_tests_count else 0:.6f} sec\n"
-            f"Fastest Query Time: {min(self.regualar_execution_times) if self.regualar_execution_times else 0:.6f} sec\n"
-            f"Slowest Query Time: {max(self.regualar_execution_times) if self.regualar_execution_times else 0:.6f} sec\n"
+            f"Avg Query Exec Time: {self.total_exec_time / self.run_tests_count if self.run_tests_count else 0:.6f} sec\n"
+            f"Min Query Exec Time: {min(self.regualar_execution_times) if self.regualar_execution_times else 0:.6f} sec\n"
+            f"Max Query Exec Time: {max(self.regualar_execution_times) if self.regualar_execution_times else 0:.6f} sec\n"
             f"\n--- PARALLEL QUERY STATS ---\n"
             f"Total Tests: {len(self.parallel_execution_stats)}\n"
             f"Total Time: {sum(p[0] for p in self.parallel_execution_stats):.4f} sec\n"
+            f"Avg Execution Time: {sum((p[3] for p in self.parallel_execution_stats)) / len(self.parallel_execution_stats) if self.parallel_execution_stats else 0:.4f} sec\n"
             f"Min Execution Time: {max((p[1] for p in self.parallel_execution_stats), default=0):.4f} sec\n"
             f"Max Execution Time: {min((p[2] for p in self.parallel_execution_stats), default=0):.4f} sec\n"
-            f"Avg Execution Time: {sum((p[3] for p in self.parallel_execution_stats)) / len(self.parallel_execution_stats) if self.parallel_execution_stats else 0:.4f} sec\n"
             f".............................................\n"
             f"Failed Queries: {self.fail_count}\n"
             f"Median Time by Query Type: { {k: round(v, 6) for k, v in median_by_type.items()} }\n"

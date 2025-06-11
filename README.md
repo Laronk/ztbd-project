@@ -70,23 +70,17 @@ docker-compose up -d postgres pgloader
 To execute the full test suite after data import:
 
 ```bash
-docker-compose run --rm database-tester
+docker-compose run --rm database-tester --file "test_postgres_queries_simple.json"
 ```
 
 You can also selectively run **specific test suites**:
 
 ```bash
-docker-compose run --rm database-tester --suites "Exploratory" "Analytical"
-```
-
-To use a custom query file:
-
-```bash
-docker-compose run --rm database-tester --file tests/my_custom_queries.json
+docker-compose run --rm database-tester --file "test_postgres_queries_simple.json" --suites "Exploratory" "Analytical"
 ```
 
 📝 **Note:**
-- Test queries are defined in `test_postgres_queries.json`
+- Test queries are defined in `test_postgres_queries_*.json` files
 - Suite names must match the keys in that file
 
 ---
