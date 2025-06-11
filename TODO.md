@@ -102,10 +102,10 @@
 
 - [ ] **Translate the queries from postgres to mongoDB format**
 
-- [ ] Diagram ERD
+- [x] Diagram ERD
 
 - [ ] Finish project raport
 
-- [ ] Create final project prezentation
+- [x] Create final project prezentation
 
 - [ ] Write grater number of and more apropriate parallel tests
