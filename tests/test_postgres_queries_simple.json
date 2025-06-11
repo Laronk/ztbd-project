@@ -11,7 +11,6 @@
         "queries": [
             {
                 "label": "First 10 patients",
-                "skip": true,
                 "setup": [
                     "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (1000001, '45', 'Male', 1);",
                     "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (1000002, '34', 'Female', 2);",
@@ -23,7 +22,6 @@
             },
             {
                 "label": "List unique hospitals",
-                "skip": false,
                 "query": "SELECT DISTINCT hospitalid FROM patient LIMIT 10;"
             },
             {
@@ -32,7 +30,6 @@
             },
             {
                 "label": "List lab test names",
-                "skip": "This is a test skip reason",
                 "query": "SELECT DISTINCT labname FROM lab LIMIT 10;"
             },
             {
@@ -99,18 +96,59 @@
     "Parallel": {
         "queries": [
             {
-                "label": "Simulated lab session per client",
+                "label": "Deleting Most Recent Lab Entry",
                 "run_parallel": true,
                 "setup": [
-                    "INSERT INTO patient (patientunitstayid, age, gender, hospitalid) VALUES (7777777, '30', 'Other', 5);"
+                    "INSERT INTO lab (patientunitstayid, labname, labresult, labresultoffset) VALUES (9999999, 'Hb', '13.2', 100);",
+                    "INSERT INTO lab (patientunitstayid, labname, labresult, labresultoffset) VALUES (9999999, 'Hb', '13.1', 200);"
                 ],
                 "query_seq": [
-                    "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (7777777, 'Na+', '137.0');",
-                    "INSERT INTO lab (patientunitstayid, labname, labresult) VALUES (7777777, 'K+', '4.5');",
-                    "DELETE FROM lab WHERE patientunitstayid = 7777777 AND labname IN ('Na+', 'K+');"
+                    "DELETE FROM lab WHERE labresultoffset = (SELECT MAX(labresultoffset) FROM lab WHERE patientunitstayid = 9999999);"
                 ],
-                "simulated_client_number": 3,
+                "simulated_client_number": 5,
+                "queries_per_time": 1,
+                "execution_loop_time_ms": 1000
+            },
+            {
+                "label": "Concurrent Vitals Correction Passes",
+                "run_parallel": true,
+                "setup": [
+                    "INSERT INTO vitalperiodic (patientunitstayid, observationoffset, heartrate) VALUES (8888888, 0, 85);"
+                ],
+                "query_seq": [
+                    "UPDATE vitalperiodic SET heartrate = heartrate + 1 WHERE patientunitstayid = 8888888;",
+                    "UPDATE vitalperiodic SET heartrate = heartrate - 1 WHERE patientunitstayid = 8888888;"
+                ],
+                "simulated_client_number": 5,
                 "queries_per_time": 2,
+                "execution_loop_time_ms": 1000
+            },
+            {
+                "label": "Synchronizing Room Assignments",
+                "run_parallel": true,
+                "setup": [
+                    "INSERT INTO patient (patientunitstayid, age, gender, hospitalid, unittype) VALUES (8888888, '60', 'Female', 4, 'Stepdown');"
+                ],
+                "query_seq": [
+                    "UPDATE patient SET unittype = 'ICU' WHERE patientunitstayid = 8888888;",
+                    "UPDATE patient SET unittype = 'Stepdown' WHERE patientunitstayid = 8888888;"
+                ],
+                "simulated_client_number": 5,
+                "queries_per_time": 2,
+                "execution_loop_time_ms": 1000
+            },
+            {
+                "label": "Deleting Most Recent Vital Entry",
+                "run_parallel": true,
+                "setup": [
+                    "INSERT INTO vitalperiodic (patientunitstayid, observationoffset, heartrate) VALUES (9999999, 100, 70);",
+                    "INSERT INTO vitalperiodic (patientunitstayid, observationoffset, heartrate) VALUES (9999999, 200, 72);"
+                ],
+                "query_seq": [
+                    "DELETE FROM vitalperiodic WHERE observationoffset = (SELECT MAX(observationoffset) FROM vitalperiodic WHERE patientunitstayid = 9999999);"
+                ],
+                "simulated_client_number": 5,
+                "queries_per_time": 1,
                 "execution_loop_time_ms": 1000
             }
         ]
