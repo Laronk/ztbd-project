@@ -108,4 +108,4 @@
 
 - [x] Create final project prezentation
 
-- [ ] Write grater number of and more apropriate parallel tests
+- [x] Write grater number of and more apropriate parallel tests
