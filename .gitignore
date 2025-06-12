@@ -7,3 +7,5 @@ schema_with_foreign_keys.sql
 .gitignore
 schema.sql
 **/__pycache__/*
+init/eicu_json/*
+tests/logs/*
