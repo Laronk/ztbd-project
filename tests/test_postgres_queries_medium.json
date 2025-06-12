@@ -27,11 +27,11 @@
             },
             {
                 "label": "Gender-disaggregated lab result averages",
-                "query": "SELECT p.gender, l.labname, AVG(CAST(l.labresult AS DOUBLE PRECISION)) AS avg_result FROM patient p JOIN lab l ON p.patientunitstayid = l.patientunitstayid WHERE l.labresult ~ '^[0-9.]+$' GROUP BY p.gender, l.labname LIMIT 20;"
+                "query": "SELECT p.gender, l.labname, AVG(CAST(l.labresult AS DOUBLE PRECISION)) AS avg_result FROM patient p JOIN lab l ON p.patientunitstayid = l.patientunitstayid WHERE l.labresult::text ~ '^[0-9.]+$' GROUP BY p.gender, l.labname LIMIT 20;"
             },
             {
                 "label": "Max lab result per patient",
-                "query": "SELECT patientunitstayid, MAX(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult ~ '^[0-9.]+$' GROUP BY patientunitstayid ORDER BY MAX(CAST(labresult AS DOUBLE PRECISION)) DESC LIMIT 10;"
+                "query": "SELECT patientunitstayid, MAX(CAST(labresult AS DOUBLE PRECISION)) FROM lab WHERE labresult::text ~ '^[0-9.]+$' GROUP BY patientunitstayid ORDER BY MAX(CAST(labresult AS DOUBLE PRECISION)) DESC LIMIT 10;"
             }
         ]
     },
@@ -51,7 +51,7 @@
             },
             {
                 "label": "Highly connected patients",
-                "query": "SELECT p.patientunitstayid, (SELECT COUNT(*) FROM vitalperiodic v WHERE v.patientunitstayid = p.patientunitstayid) AS vitals, (SELECT COUNT(*) FROM diagnosis d WHERE d.patientunitstayid = p.patientunitstayid) AS dx, (SELECT COUNT(*) FROM lab l WHERE l.patientunitstayid = p.patientunitstayid) AS labs FROM patient p ORDER BY (vitals + dx + labs) DESC LIMIT 10;"
+                "query": "SELECT * FROM (SELECT p.patientunitstayid, (SELECT COUNT(*) FROM vitalperiodic v WHERE v.patientunitstayid = p.patientunitstayid) AS vitals, (SELECT COUNT(*) FROM diagnosis d WHERE d.patientunitstayid = p.patientunitstayid) AS dx, (SELECT COUNT(*) FROM lab l WHERE l.patientunitstayid = p.patientunitstayid) AS labs FROM patient p) sub ORDER BY (vitals + dx + labs) DESC LIMIT 10;"
             }
         ]
     },
@@ -60,12 +60,10 @@
             {
                 "label": "Full lifecycle note",
                 "setup": [
-                    "INSERT INTO note (patientunitstayid, notetext) VALUES (8888888, 'Initial note');"
+                    "INSERT INTO note (patientunitstayid, notetext) VALUES (8888888, 'Initial note');",
+                    "UPDATE note SET notetext = 'Updated note' WHERE patientunitstayid = 8888888;"
                 ],
-                "query_seq": [
-                    "UPDATE note SET notetext = 'Updated note' WHERE patientunitstayid = 8888888;",
-                    "DELETE FROM note WHERE patientunitstayid = 8888888;"
-                ]
+                "query": "DELETE FROM note WHERE patientunitstayid = 8888888;"
             }
         ]
     },
